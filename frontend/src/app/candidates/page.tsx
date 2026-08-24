@@ -77,13 +77,13 @@ export default function CandidatesPage() {
                         </span>
 
                         <span className="mt-2 text-xs text-slate-500">
-                            PDF or supported resume document
+                            PDF files only
                         </span>
 
                         <input
                             type="file"
                             className="hidden"
-                            accept=".pdf,.doc,.docx"
+                            accept=".pdf"
                             onChange={(event) => {
                                 const selectedFile =
                                     event.target.files?.[0] ?? null;
@@ -130,12 +130,12 @@ export default function CandidatesPage() {
                 {candidate && (
                     <div className="mt-8 max-w-3xl rounded-xl border bg-white p-8 shadow-sm">
                         <h2 className="text-lg font-semibold text-slate-900">
-                            Extracted Candidate
+                            Candidate Profile
                         </h2>
 
-                        <pre className="mt-4 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-white">
-                            {JSON.stringify(candidate, null, 2)}
-                        </pre>
+                        <p className="mt-2 text-sm text-slate-600">
+                            Candidate profile successfully extracted and saved.
+                        </p>
                     </div>
                 )}
             </div>

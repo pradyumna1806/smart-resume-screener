@@ -26,3 +26,31 @@ async def get_candidate(candidate_id: str):
     )
 
     return document
+
+async def get_candidates(
+    search: str = "",
+    limit: int = 20,
+):
+    query = {}
+
+    if search.strip():
+        query = {
+            "$or": [
+                {"name": {"$regex": search.strip(), "$options": "i"}},
+                {"email": {"$regex": search.strip(), "$options": "i"}},
+            ]
+        }
+
+    cursor = (
+        mongodb.database[COLLECTION_NAME]
+        .find(query)
+        .sort("created_at", -1)
+        .limit(limit)
+    )
+
+    candidates = await cursor.to_list(length=limit)
+
+    for candidate in candidates:
+        candidate["_id"] = str(candidate["_id"])
+
+    return candidates

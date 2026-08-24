@@ -33,3 +33,33 @@ async def get_job(job_id: str):
     )
 
     return document
+
+
+async def get_jobs(
+    search: str = "",
+    limit: int = 20,
+):
+    query = {}
+
+    if search.strip():
+        query = {
+            "$or": [
+                {"title": {"$regex": search.strip(), "$options": "i"}},
+                {"keywords": {"$regex": search.strip(), "$options": "i"}},
+                {"domain_terms": {"$regex": search.strip(), "$options": "i"}},
+            ]
+        }
+
+    cursor = (
+        mongodb.database[COLLECTION_NAME]
+        .find(query)
+        .sort("created_at", -1)
+        .limit(limit)
+    )
+
+    jobs = await cursor.to_list(length=limit)
+
+    for job in jobs:
+        job["_id"] = str(job["_id"])
+
+    return jobs

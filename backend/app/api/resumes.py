@@ -4,7 +4,10 @@ from app.schemas.candidate import CandidateProfile
 from app.services.llm_service import extract_candidate_profile
 from app.services.resume_parser import extract_text_from_pdf
 from app.database.candidate_repository import create_candidate
-
+from app.database.candidate_repository import (
+    create_candidate,
+    get_candidates,
+)
 
 router = APIRouter(
     prefix = "/api/resumes",
@@ -55,4 +58,33 @@ async def extract_resume(file: UploadFile = File(...)):
         raise HTTPException(
             status_code = 500,
             detail = f"Resume processing failed : {exc}",
+        ) from exc
+
+
+@router.get("")
+async def list_candidates(
+    search: str = "",
+    limit: int = 20,
+):
+    if limit < 1 or limit > 50:
+        raise HTTPException(
+            status_code=400,
+            detail="Limit must be between 1 and 50.",
+        )
+
+    try:
+        candidates = await get_candidates(
+            search=search,
+            limit=limit,
+        )
+
+        return {
+            "candidates": candidates,
+            "count": len(candidates),
+        }
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to retrieve candidates: {exc}",
         ) from exc
